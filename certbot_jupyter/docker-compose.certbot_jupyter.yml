@@ -21,7 +21,7 @@ services:
       - grafana
       - influxdb
       - telegraf
-      - datascience-notebook
+      - jupyter
     volumes:
       # Traefik Static Configuration
       - ./traefik/traefik.toml:/etc/traefik/traefik.toml
@@ -104,15 +104,13 @@ services:
       - "traefik.http.routers.grafana-router=grafana-router@file"
       - "traefik.http.routers.grafana-router.service=grafana@file"
 
-  datascience-notebook:
+  jupyter:
     image: jupyter/datascience-notebook
     volumes:
       - jupyter_data:/home/jovyan/work
       - jupyter_datasets:/home/jovyan/work/datasets
       - jupyter_modules:/home/jovyan/work/modules
-    ports:
-      - 8888:8888
-    container_name: jupyter_notebook
+    container_name: jupyter
     command: "start-notebook.sh --NotebookApp.password=sha1:d4c78fe19cb5:0c8f830971d52da9d74b9985a8b87a2b80fc6e6a"
     labels:
       - "traefik.enable=true"
