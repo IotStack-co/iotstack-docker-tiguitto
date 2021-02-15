@@ -31,7 +31,7 @@
             entryPoints = ["web-secure"]
             service = "jupyter"
 
-            [http.routers.influxdb-router.tls]
+            [http.routers.jupyter-router.tls]
                 certResolver = "myresolver"
 
         [http.routers.mqtt-router]
