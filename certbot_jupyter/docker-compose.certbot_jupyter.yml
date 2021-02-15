@@ -21,7 +21,6 @@ services:
       - grafana
       - influxdb
       - telegraf
-      - jupyter
       - datascience-notebook
     volumes:
       # Traefik Static Configuration
