@@ -1,0 +1,101 @@
+[agent]
+    interval = "20s"
+    round_interval = true
+    metric_batch_size = 1000
+    metric_buffer_limit = 10000
+    collection_jitter = "0s"
+    flush_interval = "10s"
+    flush_jitter = "0s"
+    precision = ""
+    debug = true
+    quiet = false
+    hostname = ""
+    omit_hostname = true
+
+#############################################################
+#                   OUTPUT PLUGINS                          #
+#############################################################
+[[outputs.influxdb]]
+    urls = [ "http://influxdb:8086" ]
+
+    database = "edge"
+
+    skip_database_creation = false
+
+    timeout = "5s"
+    username = "${INFLUXDB_USER}"
+    password = "${INFLUXDB_USER_PASSWORD}"
+    ## Use TLS but skip chain & host verification
+    insecure_skip_verify = true
+
+###############################################################
+#                   PROCESSOR PLUGINS                         #
+###############################################################
+
+[[processors.regex]]
+
+    order = 1
+
+    [[processors.regex.tags]]
+
+        # use the `topic` tag to extract information from the MQTT Topic
+        key = "topic"
+        # Topic: IOT/<SENSOR_ID>/<measurement>
+        # Extract <SENSOR_ID>
+        pattern = ".*/(.*)/.*"
+        # Replace the first occurrence
+        replacement = "${1}"
+        # Store it in tag called:
+        result_key = "sensorID"
+
+
+[[processors.enum]]
+
+    order = 2
+
+    [[processors.enum.mapping]]
+
+        # create a mapping between extracted sensorID and some meta-data
+        tag = "sensorID"
+        dest = "location"
+
+        [processors.enum.mapping.value_mappings]
+            "sensor1" = "kitchen"
+            "sensor2" = "livingroom"
+
+##################################################################
+#                   INPUT PLUGINS                                #
+##################################################################
+
+[[inputs.mqtt_consumer]]
+
+    servers = [ "tcp://mosquitto:8883" ]
+
+    # Topics to subscribe to:
+    topics = [
+        "IOT/+/acc",
+        "IOT/+/mag",
+        "IOT/+/gyro",
+        "IOT/+/temp"
+    ]
+
+    # Telegraf will also store the topic as a tag with name `topic`
+    # NOTE: necessary for the Processor REGEX to extract <Sensor_ID>
+    topic_tag = "topic"
+
+    # Connection timeout
+    connection_timeout = "30s"
+
+    username = "${TG_MOSQUITTO_USERNAME}"
+    password = "${TG_MOSQUITTO_PASSWORD}"
+
+    ## Use TLS but skip chain & host verification
+    # Use Certificates if `require_certificate true` in `mosquitto.conf` file
+    #tls_ca = "/etc/telegraf/ca.crt"
+    #tls_cert = "/etc/telegraf/mqtt-client.crt"
+    #tls_key = "/etc/telegraf/mqtt-client.key"
+    ## Use TLS but skip chain & host verification
+    #insecure_skip_verify = true
+
+    # Incoming MQTT Payload from Sensor nodes is in InfluxDB Line Protocol strings
+    data_format = "influx"
