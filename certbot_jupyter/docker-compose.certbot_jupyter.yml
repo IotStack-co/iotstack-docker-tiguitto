@@ -106,7 +106,6 @@ services:
 
   datascience-notebook:
     image: jupyter/datascience-notebook
-    env_file: certbot.env
     volumes:
       - jupyter_data:/home/jovyan/work
       - jupyter_datasets:/home/jovyan/work/datasets
@@ -119,6 +118,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.jupyter-router=jupyter-router@file"
       - "traefik.http.routers.jupyter-router.service=jupyter@file"
+    networks:
+      - "iotstack"
 
 volumes:
   influxdb_data:
