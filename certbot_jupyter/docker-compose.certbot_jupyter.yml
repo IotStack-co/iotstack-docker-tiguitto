@@ -108,9 +108,9 @@ services:
     image: jupyter/datascience-notebook
     env_file: certbot.env
     volumes:
-      - jupyter_data/work:/home/jovyan/work
-      - jupyter_data/datasets:/home/jovyan/work/datasets
-      - jupyter_data/modules:/home/jovyan/work/modules
+      - jupyter_data:/home/jovyan/work
+      - jupyter_datasets:/home/jovyan/work/datasets
+      - jupyter_modules:/home/jovyan/work/modules
     ports:
       - 8888:8888
     container_name: jupyter_notebook
@@ -124,6 +124,8 @@ volumes:
   influxdb_data:
   grafana_data:
   jupyter_data:
+  jupyter_datasets:
+  jupyter_modules:
 
 networks:
   iotstack:
