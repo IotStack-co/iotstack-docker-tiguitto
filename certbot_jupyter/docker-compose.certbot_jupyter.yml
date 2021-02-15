@@ -105,13 +105,13 @@ services:
       - "traefik.http.routers.grafana-router.service=grafana@file"
 
   jupyter:
-    image: jupyter/datascience-notebook
+    image: jupyter/scipy-notebook
     volumes:
       - jupyter_data:/home/jovyan/work
       - jupyter_datasets:/home/jovyan/work/datasets
       - jupyter_modules:/home/jovyan/work/modules
     container_name: jupyter
-    command: "start-notebook.sh --NotebookApp.password=sha1:d4c78fe19cb5:0c8f830971d52da9d74b9985a8b87a2b80fc6e6a"
+    command: "start-notebook.sh"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jupyter-router=jupyter-router@file"
